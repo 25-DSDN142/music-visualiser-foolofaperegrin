@@ -16,7 +16,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
    let hourglassScale = 0.2;
  
 //fade wallpaper pattern with overlay
-let overlayColor = 'rgba(35, 41, 36, 0.85)';
+let overlayColor = 'rgba(80, 56, 73, 0.64)';
 fill(overlayColor);
 rect(0, 0, (mid_x*4), (mid_y*4));
 
@@ -67,12 +67,12 @@ let n = 0.5; //Pattern Density
 let offset = 150; //Row offset for wallpaper effect
 
 //COLOURS
-let color1 = 'rgba(7, 43, 9, 0.8)'; //tri color
+let color1 = 'rgba(0, 251, 13, 0.95)'; //tri color
 let color3 = 'rgba(166, 236, 223, 0.54)'; //ellipse 2 color
 let color4 = 'rgba(200, 214, 182, 0.12)'; //ellipse 1 color
 
 //STROKES
-let strokeColor1 = 'rgba(153, 207, 163, 0.09)'; //triangle stroke color, tint
+let strokeColor1 = 'rgba(219, 213, 184, 0.21)'; //triangle stroke color, tint
 let strokeColor2 = 'rgba(209, 208, 136, 0.11)'; //flashing lights color
 let strokeColor3 = 'rgba(0, 0, 0, 0.55)'; //ellipse 1 stroke color
 let strokeModifier = 2800; //stroke modifier
@@ -104,13 +104,13 @@ function draw_animated_wallpaper(vocal, drum, bass, other, counter) {
 
 function draw_wallpaper_pattern(vocal, drum, bass, other, avgVolume, counter) {
   // Calculate music-responsive values
-  let animated_e2 = e2 + map(other, 0, 100, -e2*0.5, e2*0.9);
+  let animated_e2 = e2 + map(other, 0, 100, -e2*0.5, e2*3.9);
   
   // Sine wave animations driven by counter
-  let sineWave = sin(counter * 0.02);
+  let sineWave = sin(counter * 2.2);
   let animated_elementWidth = elementWidth + (sineWave * elementWidth * 0.3);
   let animated_elementHeight = elementHeight + (sineWave * elementHeight * 0.3);
-  let animated_e = e + (sineWave * e * 2);
+  let animated_e = e + map(drum, 0, 100, -e*0.8, e*3.2) + (sineWave * e * 2);
   let animated_triangleSize = triangleSize + (sineWave * triangleSize * 0.5);
   
   // Draw the wallpaper pattern in a grid to fill the entire canvas
@@ -132,14 +132,14 @@ function draw_wallpaper_pattern(vocal, drum, bass, other, avgVolume, counter) {
       
       // Apply row offset for alternating rows (creates the wallpaper effect)
       if (row % 2 === 1) {
-        x += offset;
+        x += offset+(counter*1);
       }
       
       push();
       translate(x, y);
       
       // Draw the symbol for this cell
-      draw_wallpaper_symbol(strokeModifier, animated_elementWidth, animated_elementHeight, animated_e, animated_e2, animated_triangleSize);
+      draw_wallpaper_symbol(strokeModifier, animated_elementWidth, animated_elementHeight, animated_e, animated_e2, animated_triangleSize, counter);
       
       pop();
     }
@@ -148,34 +148,25 @@ function draw_wallpaper_pattern(vocal, drum, bass, other, avgVolume, counter) {
   pop();
 }
 
-function draw_wallpaper_symbol(strokeMod, elemWidth, elemHeight, scaleE, scaleE2, triSize) {
+function draw_wallpaper_symbol(strokeMod, elemWidth, elemHeight, scaleE, scaleE2, triSize, counter) {
   // Draw the pattern elements for a single cell
   let d = (cell_size/n)*(n+1);
-  
+  let osc1 = 2;
+
   for (let i = 0; i < n+1; i++) {
-    let r = i * d*2;
+    let r = i * d;
     
     for (let k = 0; k < n+1; k++) {
-      // Ellipse 1
-      /*let x = random(0, 1);
-      
-      strokeWeight(0.07*strokeMod);
-      stroke(strokeColor2);
-      fill(color3);
-      if (x < 0.1) { //draw an ellipse
-        if (x < 0.2) {noFill();} //prevent fill on very large ellipses
-        ellipse((k*r),((k*r)/n), (elemWidth*((scaleE*0.4/k)*scaleE2))*i*(0.09/x), (elemHeight*(scaleE*0.4)*scaleE2)*i*(0.09/x));
-      }*/
-      
+           
       // Ellipse 2
       strokeWeight(0.03*strokeMod);
       stroke(strokeColor3);
       fill(color4);
-      ellipse(cell_size*0.5*k, cell_size*0.5*k, (1*elemWidth*(scaleE))*k, (1*elemHeight*(scaleE))*k);
+      ellipse(sin(counter*osc1)*cell_size*0.5*k, cell_size*0.5*k, (1*elemWidth*(scaleE))*k, (1*elemHeight*(scaleE))*k);
       
       // Triangle
       push();
-      let t = k * triSize;
+      let t = sin(counter*osc1)*k * triSize;
       strokeWeight(0.1*strokeMod);
       stroke(strokeColor1);
       fill(color1);
