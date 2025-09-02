@@ -101,9 +101,9 @@ let gridWidth = 540/4;   // 540 / 4
 let gridHeight = 960/4; // 960 / 4
 let cellSize = 4;     // 2 pixels per cell
 let sandGrid = [];
-let sandcolor = 'rgba(255, 232, 150, 0.5)';   // Color 1
+let sandcolor = 'rgba(255, 232, 150, 0.86)';   // Color 1
 let sandcolor2 = 'rgba(200, 150, 100, 0.5)';  // Color 2
-let sandcolor3 = 'rgba(150, 100, 50, 0.5)';   // Color 3
+let sandcolor3 = 'rgb(150, 100, 50)';   // Color 3
 let sandcolor4 = 'rgba(100, 50, 25, 0.5)';    // Color 4
 
 
@@ -170,19 +170,19 @@ function drawSand() {
       let screenY = y * cellSize;
       
       if (sandGrid[y][x] === 1) {
-        fill(sandcolor);  // Use your defined color
+        fill(sandcolor);  
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 2) {
-        fill(sandcolor2); // Use your defined color
+        fill(sandcolor2); 
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 3) {
-        fill(sandcolor3); // Use your defined color
+        fill(sandcolor3); 
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 4) {
-        fill(sandcolor4); // Use your defined color
+        fill(sandcolor4); 
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 5) {
-        fill(139, 69, 19); // Ground
+        fill(139, 69, 19); // Ground!
         rect(screenX, screenY, cellSize, cellSize);
       }
     }
@@ -191,15 +191,13 @@ function drawSand() {
 
 function spawnSand() {
   console.log("spawnSand");
-  // Convert mouse position to grid coordinates
+  // mouse pos to grid
   let gridX = Math.floor(mouseX / cellSize);
   let gridY = Math.floor(mouseY / cellSize);
   
- 
-  // Brush radius (you can make this adjustable)
   let brushRadius = 2;
   
-  // Create sand in a circular area around the click
+  // Spawn sand in radius
   for (let y = gridY - brushRadius; y <= gridY + brushRadius; y++) {
     for (let x = gridX - brushRadius; x <= gridX + brushRadius; x++) {
       // Check if this position is within the brush radius
