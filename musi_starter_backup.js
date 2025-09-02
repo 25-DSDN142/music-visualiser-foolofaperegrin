@@ -6,29 +6,19 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
    // Draw animated wallpaper background first
   draw_animated_wallpaper(vocal, drum, bass, other, counter);
   
- if (mouseIsPressed){
-  spawnSand();
- }
+  //textFont('Verdana'); // please use CSS safe fonts
+  rectMode(CENTER)
+  textSize(24);
   
-  // Draw sand simulation
-  //if(songIsPlaying) {
-    fallingSand();
-    drawSand();
-  //}
-
-
-   //Variable Setups
+  
    let mid_y = height/2;
    let mid_x = width / 2;
    let hourglassScale = 0.2;
-
  
 //fade wallpaper pattern with overlay
 let overlayColor = 'rgba(80, 56, 73, 0.64)';
 fill(overlayColor);
 rect(0, 0, (mid_x*4), (mid_y*4));
-
-
 
 // Hourglasses
 
@@ -65,7 +55,6 @@ pop();
    textSize(vocal);
    text(words, width/2, height/3); */
 
-
    
 
 }
@@ -96,127 +85,9 @@ let e2 = 0.175; //2nd ellipse sizemodifier
 let triangleSize = e*700.3; //triangle vertex size
 let rotateMod = 90; //rotation of triangle
 
-//Falling Sand Setup
-let gridWidth = 540/4;   // 540 / 4
-let gridHeight = 960/4; // 960 / 4
-let cellSize = 4;     // 2 pixels per cell
-let sandGrid = [];
-let sandcolor = 'rgba(255, 232, 150, 0.5)';   // Color 1
-let sandcolor2 = 'rgba(200, 150, 100, 0.5)';  // Color 2
-let sandcolor3 = 'rgba(150, 100, 50, 0.5)';   // Color 3
-let sandcolor4 = 'rgba(100, 50, 25, 0.5)';    // Color 4
 
 
 
-
-
-//Falling Sand Function
-function setupSandGrid() {
-
-  //sets up grid coordinate system using two arrays created for x and y based on pixel dimensions
-//0 = empty, 1-4= sand 5= solid
-
-  for (let y = 0; y < gridHeight; y++) {
-    sandGrid[y] = [];
-    for (let x = 0; x < gridWidth; x++) {
-      sandGrid[y][x] = 0; //empty each cell
-    }
-    }
-
-  // Add solid ground at the bottom
-  for (let x = 0; x < gridWidth; x++) {
-    sandGrid[gridHeight-1][x] = 5;
-    }
-  
-  // Add some initial sand at the top
-  for (let x = gridWidth; x < gridWidth; x++) {
-    sandGrid[0][x] = 1;
-    sandGrid[x][gridHeight/2] = 1;
-  }
-}
-
-function fallingSand(){
-//This function runs from bottom to top along the sandGrid. 
-  for (let y = gridHeight - 2; y >= 0; y--) {
-    for (let x = 0; x < gridWidth; x++) {
-    //Check if there is sand in each cell.
-      if (sandGrid[y][x] >= 1 && sandGrid[y][x] <= 4) {
-
-      //If there is, check if there is sand below it, it falls if there is not.
-      if (sandGrid[y+1][x] === 0) {
-          sandGrid[y+1][x] = sandGrid[y][x]; // Keep the same color
-        sandGrid[y][x] = 0;
-      }
-      //If there is sand below it, check if it can move diagonally.
-      else if (x > 0 && sandGrid[y + 1][x - 1] === 0) {
-          sandGrid[y + 1][x - 1] = sandGrid[y][x]; // Keep the same color
-          sandGrid[y][x] = 0;
-        }//LEFT
-        else if (x < gridWidth - 1 && sandGrid[y + 1][x + 1] === 0) {
-          sandGrid[y + 1][x + 1] = sandGrid[y][x]; // Keep the same color
-        sandGrid[y][x] = 0;
-        }//RIGHT
-              
-      }
-    }
-  }
-}
-
-function drawSand() {
-  noStroke();
-  for (let y = 0; y < gridHeight; y++) {
-    for (let x = 0; x < gridWidth; x++) {
-      let screenX = x * cellSize;
-      let screenY = y * cellSize;
-      
-      if (sandGrid[y][x] === 1) {
-        fill(sandcolor);  // Use your defined color
-        rect(screenX, screenY, cellSize, cellSize);
-      } else if (sandGrid[y][x] === 2) {
-        fill(sandcolor2); // Use your defined color
-        rect(screenX, screenY, cellSize, cellSize);
-      } else if (sandGrid[y][x] === 3) {
-        fill(sandcolor3); // Use your defined color
-        rect(screenX, screenY, cellSize, cellSize);
-      } else if (sandGrid[y][x] === 4) {
-        fill(sandcolor4); // Use your defined color
-        rect(screenX, screenY, cellSize, cellSize);
-      } else if (sandGrid[y][x] === 5) {
-        fill(139, 69, 19); // Ground
-        rect(screenX, screenY, cellSize, cellSize);
-      }
-    }
-  }
-}
-
-function spawnSand() {
-  console.log("spawnSand");
-  // Convert mouse position to grid coordinates
-  let gridX = Math.floor(mouseX / cellSize);
-  let gridY = Math.floor(mouseY / cellSize);
-  
- 
-  // Brush radius (you can make this adjustable)
-  let brushRadius = 2;
-  
-  // Create sand in a circular area around the click
-  for (let y = gridY - brushRadius; y <= gridY + brushRadius; y++) {
-    for (let x = gridX - brushRadius; x <= gridX + brushRadius; x++) {
-      // Check if this position is within the brush radius
-      let distance = Math.sqrt((x - gridX) * (x - gridX) + (y - gridY) * (y - gridY));
-      
-      if (distance <= brushRadius && 
-          x >= 0 && x < gridWidth && 
-          y >= 0 && y < gridHeight)
-          if(sandGrid[y][x] === 0) { // Only if cell is empty
-          sandGrid[y][x] = 1; if(sandGrid[y][x] === 1){sandGrid[y][x] = 1;} }
-          
-      
-
-  }
-}
-
-}
 
 // Wallpaper integration functions
 function draw_animated_wallpaper(vocal, drum, bass, other, counter) {
