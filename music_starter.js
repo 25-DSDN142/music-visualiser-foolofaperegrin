@@ -4,18 +4,24 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  
  
    // Draw animated wallpaper background first
-  draw_animated_wallpaper(vocal, drum, bass, other, counter);
-  
+  //draw_animated_wallpaper(vocal, drum, bass, other, counter);
+  background(0, 0, 0);
  if (mouseIsPressed){
   spawnSand();
  }
   
   // Draw sand simulation
-  //if(songIsPlaying) {
-    fallingSand();
-    drawSand();
-  //}
+ if(songIsPlaying) {
+    fallingSand(drum);
+    spawnMusicSand(vocal, drum, bass, other);
+    drawSand(drum);
+    removeBassSand(drum);
+  
+  }
 
+  let seconds = counter/60;
+  console.log(seconds);
+  
 
    //Variable Setups
    let mid_y = height/2;
@@ -24,14 +30,16 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
  
 //fade wallpaper pattern with overlay
-let overlayColor = 'rgba(80, 56, 73, 0.64)';
+
+
+/*let overlayColor = 'rgba(0, 0, 0, 0.64)';
 fill(overlayColor);
-rect(0, 0, (mid_x*4), (mid_y*4));
+rect(0, 0, (mid_x*4), (mid_y*4));*/
 
 
 
 // Hourglasses
-
+/*
 push();
 translate(mid_x, mid_y);
 scale(hourglassScale, hourglassScale, hourglassScale);
@@ -60,11 +68,11 @@ pop();
 pop();
    
  
-  /*// display "words"
+  // display "words"
    textAlign(CENTER);
    textSize(vocal);
-   text(words, width/2, height/3); */
-
+   text(words, width/2, height/3); 
+*/
 
    
 
@@ -97,14 +105,25 @@ let triangleSize = e*700.3; //triangle vertex size
 let rotateMod = 90; //rotation of triangle
 
 //Falling Sand Setup
-let gridWidth = 540/4;   // 540 / 4
-let gridHeight = 960/4; // 960 / 4
-let cellSize = 4;     // 2 pixels per cell
+let cellSize = 4; 
+let gridWidth = 540/cellSize;   
+let gridHeight = 960/cellSize; 
+
+
 let sandGrid = [];
-let sandcolor = 'rgba(255, 232, 150, 0.86)';   // Color 1
-let sandcolor2 = 'rgba(200, 150, 100, 0.5)';  // Color 2
-let sandcolor3 = 'rgb(150, 100, 50)';   // Color 3
-let sandcolor4 = 'rgba(100, 50, 25, 0.5)';    // Color 4
+
+
+
+let sandcolor = 'rgb(0, 255, 157)';   // Color 1
+let sandcolor2 = 'rgb(255, 128, 0)';  // Color 2
+let sandcolor3 = 'rgb(212, 178, 143)';   // Color 3
+let sandcolor4 = 'rgb(255, 224, 208)';    // Color 4
+let sandcolor5 = 'rgb(255, 177, 129)';    // Color 5
+let sandcolor6 = 'rgb(255, 236, 183)';    // Color 6
+let sandcolor7 = 'rgb(212, 252, 142)';    // Color 7
+let sandcolor8 = 'rgb(255, 194, 108)';    // Color 8
+let sandcolor9 = 'rgb(255, 255, 255)';    // Color 9
+
 
 
 
@@ -114,7 +133,7 @@ let sandcolor4 = 'rgba(100, 50, 25, 0.5)';    // Color 4
 function setupSandGrid() {
 
   //sets up grid coordinate system using two arrays created for x and y based on pixel dimensions
-//0 = empty, 1-4= sand 5= solid
+//0 = empty, 1-7= sand 8= solid
 
   for (let y = 0; y < gridHeight; y++) {
     sandGrid[y] = [];
@@ -125,22 +144,31 @@ function setupSandGrid() {
 
   // Add solid ground at the bottom
   for (let x = 0; x < gridWidth; x++) {
-    sandGrid[gridHeight-1][x] = 5;
+    sandGrid[gridHeight-1][x] = 9;
     }
   
-  // Add some initial sand at the top
-  for (let x = gridWidth; x < gridWidth; x++) {
-    sandGrid[0][x] = 1;
-    sandGrid[x][gridHeight/2] = 1;
+  
   }
-}
 
-function fallingSand(){
+
+function fallingSand(drum){
 //This function runs from bottom to top along the sandGrid. 
   for (let y = gridHeight - 2; y >= 0; y--) {
     for (let x = 0; x < gridWidth; x++) {
     //Check if there is sand in each cell.
-      if (sandGrid[y][x] >= 1 && sandGrid[y][x] <= 4) {
+      if (sandGrid[y][x] >= 1 && sandGrid[y][x] <= 9) {
+        let driftThreshold = map(drum, 0, 100, 0.01, 0.05);
+       if (random() < driftThreshold) {
+        // Add random horizontal drift
+       let drift = Math.floor(random(-1, 2)); // -1, 0, or 1
+       let newX = x + drift;
+       
+       // Check if can fall with drift
+       if (newX >= 0 && newX < gridWidth && sandGrid[y+1][newX] === 0) {
+         sandGrid[y+1][newX] = sandGrid[y][x];
+         sandGrid[y][x] = 0;
+       }
+      }
 
       //If there is, check if there is sand below it, it falls if there is not.
       if (sandGrid[y+1][x] === 0) {
@@ -162,15 +190,24 @@ function fallingSand(){
   }
 }
 
-function drawSand() {
+function drawSand(b) {
+
+let sC = color(sandcolor);
+let sC2 = color(sandcolor2);
+
+let colorDriver = map(b, 0, 100, 0, 1);
+
+
   noStroke();
+
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       let screenX = x * cellSize;
       let screenY = y * cellSize;
       
       if (sandGrid[y][x] === 1) {
-        fill(sandcolor);  
+        let sandcolorLerp = lerpColor(sC, sC2, colorDriver);
+        fill(sandcolorLerp);  
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 2) {
         fill(sandcolor2); 
@@ -182,7 +219,19 @@ function drawSand() {
         fill(sandcolor4); 
         rect(screenX, screenY, cellSize, cellSize);
       } else if (sandGrid[y][x] === 5) {
-        fill(139, 69, 19); // Ground!
+        fill(sandcolor5); 
+        rect(screenX, screenY, cellSize, cellSize);
+      } else if (sandGrid[y][x] === 6) {
+        fill(sandcolor6); 
+        rect(screenX, screenY, cellSize, cellSize);
+      } else if (sandGrid[y][x] === 7) {
+        fill(sandcolor7); 
+        rect(screenX, screenY, cellSize, cellSize);
+      } else if (sandGrid[y][x] === 8) {
+        fill(sandcolor8); 
+        rect(screenX, screenY, cellSize, cellSize);
+      } else if (sandGrid[y][x] === 9) {
+        fill(255, 255, 255); // Ground!
         rect(screenX, screenY, cellSize, cellSize);
       }
     }
@@ -212,9 +261,92 @@ function spawnSand() {
       
 
   }
+
+  
 }
 
 }
+
+function spawnMusicSand(vocal, drum, bass, other) {
+  // Mappings
+  let spawnRate = map(other, 0, 100, 0, 1);       
+  let spawnRadius = map(bass, 0, 100, 0.01, 2);       // Bigger spawn areas
+  let spawnIntensity = map(other, 0, 100, 0, 0.5); // Always some spawning
+  let musicSandColor = map(drum, 0, 100, 0, 9);
+
+  // Only spawn if intensity is high enough
+  if (random() < spawnIntensity) {
+    
+    // Spawn multiple particles based on spawn rate
+    for (let i = 0; i < spawnRate; i++) {
+      
+      // centre position in upper  of screen
+      let spawnX = random(width/4, (width/4)*2);
+      let spawnY = random(0, height / 6);  // upper 
+      
+      // Convert to grid coordinates
+      let gridX = Math.floor(spawnX / cellSize);
+      let gridY = Math.floor(spawnY / cellSize);
+      
+      // Create sand in a small area around the spawn point
+      for (let y = gridY - spawnRadius; y <= gridY + spawnRadius; y++) {
+        for (let x = gridX - spawnRadius; x <= gridX + spawnRadius; x++) {
+          let distance = Math.sqrt((x - gridX) * (x - gridX) + (y - gridY) * (y - gridY));
+          
+          if (distance <= spawnRadius && 
+              x >= 0 && x < gridWidth && 
+              y >= 0 && y < gridHeight &&
+              sandGrid[Math.floor(y)][Math.floor(x)] === 0) { // Only if cell is empty
+            
+            // Random color
+            //let randomSandColor = Math.floor(random(1, 5));
+            sandGrid[Math.floor(y)][Math.floor(x)] = Math.floor(musicSandColor);
+          }
+        }
+      }
+    }
+  }
+}
+
+function removeBassSand(drum) {
+  // Map bass to removal intensity (0-100% chance)
+  let removalIntensity = map(drum, 0, 100, 0, 0.45); // Max 80% chance to remove
+  
+  // Map bass to removal radius (how many particles to remove per frame)
+  let removalRadius = map(drum, 0, 100, 1, 25); // Remove 1-5 particles per frame
+  
+  // Only remove if bass is strong enough
+  if (random() < removalIntensity) {
+    
+    // Remove multiple particles based on bass intensity
+    for (let i = 0; i < removalRadius; i++) {
+      
+      // Random position in bottom half of screen
+      let removeX = random(0, width);
+      let removeY = random(height / 2, height); // Only bottom half
+      
+      // Convert to grid coordinates
+      let gridX = Math.floor(removeX / cellSize);
+      let gridY = Math.floor(removeY / cellSize);
+      
+      // Remove sand in a small area around the removal point
+      for (let y = gridY - 2; y <= gridY + 2; y++) {
+        for (let x = gridX - 2; x <= gridX + 2; x++) {
+          let distance = Math.sqrt((x - gridX) * (x - gridX) + (y - gridY) * (y - gridY));
+          
+          if (distance <= 2 && 
+              x >= 0 && x < gridWidth && 
+              y >= 0 && y < gridHeight &&
+              sandGrid[y][x] >= 1 && sandGrid[y][x] <= 4) { // Only remove sand (not ground)
+            
+            sandGrid[y][x] = 0; // Remove the sand particle
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // Wallpaper integration functions
 function draw_animated_wallpaper(vocal, drum, bass, other, counter) {
@@ -400,3 +532,4 @@ rect(x, y+hourglassSize, hourglassSize*2+1, hourglassSize/2);
  
 
 }
+
