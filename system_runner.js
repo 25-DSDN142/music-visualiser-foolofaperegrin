@@ -55,6 +55,9 @@ function setup() {
   
   frameRate(60);
   angleMode(DEGREES);
+  
+  // Initialize sand simulation grid
+  setupSandGrid();
 
   // create text inputs
   textInput = createInput('words...');
